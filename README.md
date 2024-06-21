@@ -1,3 +1,4 @@
 # MINet
 RGB-D SOD
-[![Uploading F2.png…]()](https://github.com/jacker112/MINet/blob/main/picture/F1.jpg)
+框架图
+![框架图](https://github.com/jacker112/MINet/blob/main/picture/F1.jpg)
