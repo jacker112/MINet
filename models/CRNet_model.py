@@ -92,7 +92,7 @@ class BasicConv2d(nn.Module):    #很多模块的使用卷积层都是以其为�
         return x
 
 #Global Contextual module
-class GCM(nn.Module):  # 输入通道首先经过四个卷积层的特征提取，并采用torch.cat()进行连接，最后和输入通道的残差进行相加
+class GSA(nn.Module):  # 输入通道首先经过四个卷积层的特征提取，并采用torch.cat()进行连接，最后和输入通道的残差进行相加
     def __init__(self, in_channel, out_channel):
         super(GCM, self).__init__()
         self.relu = nn.ReLU(True)
@@ -283,7 +283,7 @@ class aggregation_init(nn.Module):           #F_CD1
 #         return x1,x2,x3
 #
 #BBSNet
-class BBSNet(nn.Module):    #网络框架
+class MINet(nn.Module):    #网络框架
     def __init__(self, channel=32):
         super(BBSNet, self).__init__()
         
@@ -291,11 +291,11 @@ class BBSNet(nn.Module):    #网络框架
         self.resnet = ResNet50('rgb')
         self.resnet_depth=ResNet50('rgbd')
 
-        #Decoder 1  高层次GCM
+        #Decoder 1  高层次GSA
         self.rfb2_1 = GCM(512, channel)
         self.rfb3_1 = GCM(1024, channel)
         self.rfb4_1 = GCM(2048, channel)
-        #Decoder 2  低层次GCM
+        #Decoder 2  低层次DS
         self.rfb0_2 = GCM(64, channel)
         self.rfb1_2 = GCM(256, channel)
         self.agg1 = aggregation_init(channel)
@@ -401,8 +401,8 @@ class BBSNet(nn.Module):    #网络框架
         #produce initial saliency map by decoder1
         x4_1 = self.rfb4_1(x4_1)
         x3_1 = self.rfb3_1(x3_1)
-        x2_1 = self.rfb2_1(x2_1)                                 #高层次网络经历CGM
-        x1_1 = self.rfb1_2(x1)                                    #低层次网络经历CGM
+        x2_1 = self.rfb2_1(x2_1)                                 #高层次网络经历DSA
+        x1_1 = self.rfb1_2(x1)                                    #低层次网络经历DS
         x1_2 = self.rfb0_2(x)
         loss0,loss1,loss2,loss3,x5_3,loss4 = self.agg1(x4_1, x3_1, x2_1,x1_1,x1_2)              #F_CD1
         #Refine low-layer features by initial map
